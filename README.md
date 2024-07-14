@@ -23,7 +23,7 @@ Gemineye Emporium faces challenges in pricing due to rapid expansion, increased 
 ## Tech Stack
 
 - **Python**: Primary language
-- **Libraries**: NumPy, Pandas, Matplotlib, Seaborn, Sci-kit Learn, RAPIDS
+- **Libraries**: NumPy, Pandas, Matplotlib, Seaborn, Sci-kit Learn, R Studio
 
 ## Project Scope
 
