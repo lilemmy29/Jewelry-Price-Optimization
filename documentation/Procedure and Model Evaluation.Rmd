@@ -1,0 +1,111 @@
+---
+title: "Jewelry Price Optimization Using ML"
+author: "Tolulope"
+date: "2024-07-14"
+output: html_document
+---
+
+# Procedures
+
+## Data Importation and Preparation
+
+### Data Importation
+
+The dataset was imported from a CSV file. The initial step involved loading the data into a Pandas DataFrame.
+
+### Column Renaming
+
+The columns of the dataset were renamed to more descriptive names to enhance readability and ease of use.
+
+### Data Exploration
+
+An initial exploration of the dataset was conducted to understand its structure, data types, and any inconsistencies or missing values.
+
+### Dropping Duplicates
+
+Duplicate entries in the dataset were removed to ensure data integrity.
+
+### Handling Missing Values
+
+Missing values in the target variable 'Price in USD' were filled with the mean value of the column to handle incomplete data.
+
+### Statistical Summary
+
+A statistical summary of the dataset was generated to understand the distribution and central tendencies of the numerical features.
+
+## Data Preprocessing
+
+### Splitting Features and Target
+
+The dataset was split into features (independent variables) and the target (dependent variable, 'Price in USD').
+
+### Data Processing
+
+Numerical and categorical features were processed separately using pipelines. Numerical features were imputed with the mean and scaled, while categorical features were imputed with the most frequent value and encoded.
+
+### Data Splitting
+
+The processed data was split into training and testing sets to evaluate the performance of the machine learning models.
+
+# Model Training and Evaluation
+
+## Model Selection
+
+Various regression models were selected for evaluation, including Linear Regression, Random Forest Regressor, XGBoost Regressor, Decision Tree Regressor, Gradient Boosting Regressor, and K-Neighbors Regressor.
+
+## Model Training
+
+Each model was trained on the training set and predictions were made on the testing set.
+
+## Model Evaluation
+
+The performance of each model was evaluated using the following metrics:
+
+-   **Coefficient of Determination (R2 Score)**: Indicates how well the model explains the variance in the target variable.
+-   **Mean Absolute Error (MAE)**: Measures the average magnitude of the errors in predictions.
+-   **Mean Absolute Percentage Error (MAPE)**: Provides the error as a percentage, which is useful for comparing the performance of models on different scales.
+
+# Evaluation
+
+## Model Performance Evaluation
+
+The performance of each model was as follows:
+
+-   **Linear Regression (LR)**:
+    -   R2 Score: 0.947
+    -   MAE: 2.437e+16
+    -   MAPE: 2.660e+31
+-   **Random Forest Regressor (RF)**:
+    -   R2 Score: 0.999
+    -   MAE: 2.839e+15
+    -   MAPE: 2.377e+30
+-   **XGBoost Regressor (XGB)**:
+    -   R2 Score: 0.0004
+    -   MAE: 1.585e+17
+    -   MAPE: 1.901e+32
+-   **Decision Tree Regressor (TREE)**:
+    -   R2 Score: 0.998
+    -   MAE: 2.283e+15
+    -   MAPE: 1.880e+30
+-   **Gradient Boosting Regressor (GR)**:
+    -   R2 Score: 0.997
+    -   MAE: 7.689e+15
+    -   MAPE: 7.337e+30
+-   **K-Neighbors Regressor (KN)**:
+    -   R2 Score: 0.927
+    -   MAE: 1.441e+16
+    -   MAPE: 8.641e+30
+
+# Insights and Trends
+
+-   **Random Forest Regressor (RF)** and **Decision Tree Regressor (TREE)** performed exceptionally well with R2 scores close to 1, indicating that these models were highly effective at explaining the variance in the target variable.
+
+-   **Gradient Boosting Regressor (GR)** also showed strong performance with a high R2 score, suggesting it as a reliable model for predicting jewelry prices.
+
+-   **Linear Regression (LR)** and **K-Neighbors Regressor (KN)**, while not as strong as the ensemble methods, still provided reasonably good predictions, indicated by their R2 scores.
+
+-   **XGBoost Regressor (XGB)** performed poorly in this scenario, with a very low R2 score and high MAE and MAPE values, suggesting it was not suitable for this dataset.
+
+-   The high MAE and MAPE values across models indicate that the dataset might contain outliers or a wide range of price values, which impacts the mean-based error metrics.
+
+-   **Ensemble Methods (Random Forest and Gradient Boosting)** generally outperformed other models, highlighting their robustness and ability to handle complex datasets with diverse feature types.
