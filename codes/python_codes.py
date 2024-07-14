@@ -205,17 +205,14 @@ updated_algorithm = models()
 # Define function to perform feature selection and evaluate models
 def feature_selection_and_evaluation(models, x_train, x_test, y_train, y_test):
     # Feature Selection and Engineering
-    # Example steps:
     
     # 1. Correlation analysis
     correlation_matrix = df.corr()
-    # Visualize correlation matrix if needed
     
     # 2. Feature importance using tree-based models (e.g., RandomForest)
     rf = RandomForestRegressor()
     rf.fit(x_train, y_train)
     feature_importances = rf.feature_importances_
-    # Plot feature importances if needed
     
     # 3. Recursive Feature Elimination (RFE) for Linear Regression
     lr = LinearRegression()
