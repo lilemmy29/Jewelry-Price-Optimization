@@ -14,6 +14,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
+from sklearn.feature_selection import RFE
+
 
 # Import and Defining the dataframe
 path = r"C:\Users\user\Desktop\JW\Jewelry-Price-Optimization-main\Jewelry-Price-Optimization\raw_data.csv"
@@ -198,6 +200,62 @@ def models():
 
 # Evaluate the models
 updated_algorithm = models()
+
+
+# Define function to perform feature selection and evaluate models
+def feature_selection_and_evaluation(models, x_train, x_test, y_train, y_test):
+    # Feature Selection and Engineering
+    # Example steps:
+    
+    # 1. Correlation analysis
+    correlation_matrix = df.corr()
+    # Visualize correlation matrix if needed
+    
+    # 2. Feature importance using tree-based models (e.g., RandomForest)
+    rf = RandomForestRegressor()
+    rf.fit(x_train, y_train)
+    feature_importances = rf.feature_importances_
+    # Plot feature importances if needed
+    
+    # 3. Recursive Feature Elimination (RFE) for Linear Regression
+    lr = LinearRegression()
+    rfe = RFE(estimator=lr, n_features_to_select=10, step=1)
+    rfe.fit(x_train, y_train)
+    selected_features_lr = x.columns[rfe.support_]
+    
+    # 4. Model-Based Feature Selection (e.g., coefficients for LR)
+    lr.fit(x_train, y_train)
+    coefficients_lr = lr.coef_
+    selected_features_lr_coef = x.columns[np.abs(coefficients_lr) > threshold]
+    
+    # 5. Combine selected features based on analysis above
+    
+    # Model Evaluation
+    for name, model in models.items():
+        # Fit the model and make predictions
+        prediction = model.fit(x_train[selected_features], y_train).predict(x_test[selected_features])
+        
+        # Print evaluation metrics for each model
+        print(f"Model: {name}")
+        print(f"Selected Features: {selected_features}")
+        print(f"R2 Score: {r2_score(y_test, prediction)}")
+        print(f"Mean Absolute Error (MAE): {mean_absolute_error(y_test, prediction)}")
+        print(f"Mean Absolute Percentage Error (MAPE): {mean_absolute_percentage_error(y_test, prediction)}")
+        print("------------------------------------------------------")
+
+# Models dictionary
+models = {
+    'LR': LinearRegression(),
+    'RF': RandomForestRegressor(),
+    'XGB': XGBRegressor(),
+    'TREE': DecisionTreeRegressor(),
+    'GR': GradientBoostingRegressor(),
+    'KN': KNeighborsRegressor()
+}
+
+# Execute feature selection and evaluation
+feature_selection_and_evaluation(models, x_train, x_test, y_train, y_test)
+
 
 
 
