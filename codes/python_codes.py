@@ -1,124 +1,115 @@
-## Importing neccesary libraries
-
+## Libraries Importation 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVR
+from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 
-## Import and Defining the dataframe
-df = pd.read_csv('Jewelry_Dataset.csv')
-df
+# Import and Defining the dataframe
+path = r"C:\Users\user\Desktop\JW\Jewelry-Price-Optimization-main\Jewelry-Price-Optimization\raw_data.csv"
+df = pd.read_csv(path)
 
-## Appending the variables names into the dataframe
-column_name = ['Order datetime', 'Order ID', 'Purchased product ID', 'Quantity of SKU in the order', 'Category ID', 'Category alias', 'Brand ID', 'Price in USD', 'User ID', 'Product gender (for male/female)', 'Main Color', 'Main metal', 'Main gem']
+# Display columns to identify mismatch
+print(df.columns)
+
+# Update the column names to match the data
+column_name = ['Order ID', 'Purchased product ID', 'Quantity of SKU in the order', 'Category ID', 'Category alias', 
+               'Brand ID', 'Price in USD', 'User ID', 'Product gender (for male/female)', 'Main Color', 'Main metal', 
+               'Main gem', 'Unnamed']  
+
+# Renaming the DataFrame columns
 df.columns = column_name
 df.head()
 
-#data exploration
+# Data exploration
 df.info()
 
-#dropping duplicate
+# Dropping duplicate entries to clean the dataset
 df.drop_duplicates(inplace=True)
 
-## Statistical Summary
-df.describe()
+# Handling missing values in the target variable 'Price in USD' by filling with the mean
+df['Price in USD'].fillna(df['Price in USD'].mean(), inplace=True)
 
+# Displaying a statistical summary of the dataset
+print(df.describe())
 
-## Splitting the dataset into Dependent(y) and Independent Varaibles(x) 
-x = df.drop(['Price in USD'],axis=1)
-y = df['Price in USD']
+# Function to split the data into features (X) and target (y)
+def split(data):
+    x = data.drop(['Price in USD'], axis=1)
+    y = data['Price in USD']
+    return x, y
 
+# Splitting the dataset
+x, y = split(df)
 
-## Splitting Variables(x,y) into training and testing sets  
-x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
-
-
-def processor(data):
-    # Make a copy of the input data to avoid modifying the original
-    data = data.copy()
-
-    # Identify numerical and categorical columns
-    num_cols = data.select_dtypes(include=["int", "float"]).columns
-    cat_cols = data.select_dtypes(include=["object"]).columns
-
-    # Numerical pipeline: Impute missing values with mean and scale numerical columns
+# Function to process the data using pipelines for numerical and categorical features
+def process(data):
+    # Pipeline for numerical features: Imputation and Scaling
     num_pipe = Pipeline([
-        ('imputer', SimpleImputer(strategy='mean')),  # Replace missing values in numerical columns with mean
-        ('scaler', StandardScaler())  # Standardize numerical columns for better model performance
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', StandardScaler())
     ])
-
-    # Categorical pipeline: Impute missing values with 'unknown' and encode categorical columns
+    
+    # Pipeline for categorical features: Imputation and Encoding
     cat_pipe = Pipeline([
-        ('imputer', SimpleImputer(strategy='constant', fill_value='unknown')),  # Replace missing values in categorical columns with 'unknown'
-        ('encoder', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1))  #Encode categorical columns to numerical values
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('encoder', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1))
     ])
-
-    # Combine numerical and categorical pipelines into a ColumnTransformer
+    
+    # Combining both pipelines using ColumnTransformer
     transformer = ColumnTransformer(
         transformers=[
-            ("numeric_pipe", num_pipe, num_cols),  # Apply num_pipe to numerical columns
-            ("categorical_pipe", cat_pipe, cat_cols)  # Apply cat_pipe to categorical columns
+            ('num_features', num_pipe, data.select_dtypes(include=['int', 'float']).columns),
+            ('cat_features', cat_pipe, data.select_dtypes(include=['object']).columns)
         ],
-        remainder="passthrough",  # Pass through any columns not specified in num_cols or        cat_cols
-        n_jobs=-1  # Use all available CPUs for parallel processing
+        remainder='drop'
     )
+    
+    # Transforming the data
+    return transformer.fit_transform(data)
 
+# Processing the features
+x_processed = process(x)
 
+# Function to split the processed data into training and testing sets
+def train(a, b):
+    x_train, x_test, y_train, y_test = train_test_split(a, b, test_size=0.25, random_state=42)
+    return x_train, x_test, y_train, y_test
 
-    return transformer
+# Splitting the data into training and testing sets
+x_train, x_test, y_train, y_test = train(x_processed, y)
 
-processed_data = processor(df)
+# Function to train and evaluate multiple regression models
+def models():
+    # Dictionary to store various regression models
+    models = {
+        'LR': LinearRegression(),
+        'RF': RandomForestRegressor(),
+        'XGB': XGBRegressor(),
+        'TREE': DecisionTreeRegressor(),
+        'GR': GradientBoostingRegressor(),
+        'KN': KNeighborsRegressor()
+    }
 
-def get_model(data):
-    # List of model tuples with names and instantiated model objects
-    models = [
-        ("randomforest_model", RandomForestRegressor()),
-        ("logistic_model", LogisticRegression()),
-        ("decisiontree_model", DecisionTreeRegressor()),
-        ("knn_model", KNeighborsRegressor()),
-        ("svm_model", SVR()),
-        ("xgboost_model", XGBRegressor())
-    ]
+    # Print model performance evaluation
+    print('Model Performance Evaluation')
+    for name, model in models.items():
+        # Fit the model and make predictions
+        prediction = model.fit(x_train, y_train).predict(x_test)
+        # Print evaluation metrics for each model
+        print(f"The Coefficient of Determination (R2 Score) for {name} model is {r2_score(y_test, prediction)}")
+        print(f"The Mean Absolute Error (MAE) for {name} model is {mean_absolute_error(y_test, prediction)}")
+        print(f"The Mean Absolute Percentage Error (MAPE) for {name} model is {mean_absolute_percentage_error(y_test, prediction)}")
 
-    # Create a list to store model pipelines
-    model_pipelines = []
-
-    # Loop through each model and create a pipeline with the preprocessor
-    for name, model in models:
-        # Create a pipeline that applies the preprocessor to the data and then the model
-        model_pipeline = make_pipeline(processed_data, model)
-        # Append the tuple of model name and its pipeline to the list
-        model_pipelines.append((name, model_pipeline))
-
-    # Return the list of model pipelines
-    return model_pipelines
-get_model(df)
-
-## Model Evaluation 
-
-'''
-def evaluate_model(pipeline, x_train, y_train, x_test, y_test):
-    # Fit the model
-    pipeline.fit(x_train, y_train)
-    # Predict on the test set
-    y_pred = pipeline.predict(x_test)
-    # Calculate RMSE
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    return rmse
-
-# Evaluate all models
-evaluation_results = {name: evaluate_model(pipeline, x_train, y_train, x_test, y_test) for name, pipeline in model_pipelines}
-evaluation_results
-'''
-
+# Evaluate the models
+algorithm = models()
