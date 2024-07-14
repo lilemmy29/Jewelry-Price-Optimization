@@ -104,3 +104,21 @@ def get_model(data):
     # Return the list of model pipelines
     return model_pipelines
 get_model(df)
+
+## Model Evaluation 
+
+'''
+def evaluate_model(pipeline, x_train, y_train, x_test, y_test):
+    # Fit the model
+    pipeline.fit(x_train, y_train)
+    # Predict on the test set
+    y_pred = pipeline.predict(x_test)
+    # Calculate RMSE
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    return rmse
+
+# Evaluate all models
+evaluation_results = {name: evaluate_model(pipeline, x_train, y_train, x_test, y_test) for name, pipeline in model_pipelines}
+evaluation_results
+'''
+
