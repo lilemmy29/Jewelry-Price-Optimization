@@ -1,5 +1,6 @@
 # Jewelry-Price-Optimization
-This repository showcases the **Jewelry Price Optimization** project aimed at refining pricing strategies for Gemineye Emporium using machine learning. Utilizing Python libraries like NumPy, Pandas, Matplotlib, Seaborn, RAPIDS, and Sci-kit Learn, this project develops predictive models to optimize jewelry prices levaraging the effieciency of Shiny on R studio for a web application.
+This repository presents the Jewelry Price Optimization project focusing on refining pricing strategies for Gemineye Emporium using machine learning. Python libraries such as NumPy, Pandas, Matplotlib, Seaborn, RAPIDS, and Sci-kit Learn are employed to develop predictive models. The project aims to optimize jewelry prices efficiently. Documentation and reporting are done using R Markdown, and interactive web applications will be built using R Shiny.
+
 
 ## Business Overview
 
